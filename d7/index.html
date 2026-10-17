@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>الخام — نظام القاضي</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* ===== الخام — brutalist: شاشة مقسومة، أرقام ضخمة، حدود سميكة سوداء، أصفر واحد، بلا استدارة ===== */
+:root {
+  color-scheme: light;
+  --bg: #f3f1ea; --paper: #ffffff; --ink: #0d0d0d; --ink-2: #3b3b3b; --ink-3: #777;
+  --y: #ffe600; --y-2: #d8c200; --red: #e0271b; --green: #1b7f4b;
+  --bw: 3px;
+  --font-ui: 'IBM Plex Sans Arabic', system-ui, sans-serif;
+  --font-reading: 'Noto Naskh Arabic', serif;
+  --fast: 100ms; --mid: 220ms; --ease: cubic-bezier(0.2, 0, 0, 1);
+  --left-w: 44%;
+}
+:root[data-theme="dark"] { color-scheme: dark; --bg: #121212; --paper: #1a1a1a; --ink: #f4f4f4; --ink-2: #c8c8c8; --ink-3: #8a8a8a; --y: #ffe600; }
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-ui); font-size: 15px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+button, input, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: var(--bw) solid var(--y); outline-offset: 0; }
+.ic { width: 18px; height: 18px; flex: none; } .ic-sm { width: 14px; height: 14px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.num { font-variant-numeric: tabular-nums; }
+
+/* ---------- top strip ---------- */
+.strip { position: sticky; top: 0; z-index: 20; display: flex; align-items: stretch; background: var(--ink); color: var(--bg); border-bottom: var(--bw) solid var(--ink); }
+.strip .brand { display: flex; align-items: center; gap: 10px; padding: 0 18px; font-weight: 700; border-inline-end: var(--bw) solid var(--bg); height: 52px; white-space: nowrap; }
+.strip .brand i { display: inline-block; width: 14px; height: 14px; background: var(--y); }
+.strip nav { display: flex; overflow-x: auto; }
+.strip nav button { height: 52px; padding: 0 16px; border: 0; border-inline-end: 1px solid #333; background: none; color: var(--bg); font-weight: 600; cursor: pointer; white-space: nowrap; font-size: 13.5px; }
+.strip nav button:hover { background: #222; }
+.strip nav button[aria-current] { background: var(--y); color: var(--ink); }
+.strip .sp { flex: 1; }
+.strip .ib { width: 52px; border: 0; border-inline-start: 1px solid #333; background: none; color: var(--bg); display: grid; place-items: center; cursor: pointer; }
+.strip .ib:hover { background: #222; }
+
+/* ---------- split ---------- */
+.split { display: grid; grid-template-columns: minmax(0, 1fr) var(--left-w); min-height: calc(100dvh - 55px); padding-bottom: 56px; }
+.panel { background: var(--y); color: #0d0d0d; border-inline-start: var(--bw) solid var(--ink); position: sticky; top: 55px; height: calc(100dvh - 55px - 56px); overflow: auto; display: flex; flex-direction: column; }
+.panel-in { padding: 26px 28px 30px; display: flex; flex-direction: column; min-height: 100%; }
+.back { position: relative; z-index: 2; align-self: flex-start; border: var(--bw) solid #0d0d0d; background: none; padding: 4px 12px; font-weight: 700; cursor: pointer; font-size: 13px; margin-bottom: 18px; }
+.back:hover { background: #0d0d0d; color: var(--y); }
+.bigno { margin-top: 10px; font-size: clamp(64px, 9vw, 128px); font-weight: 700; line-height: 1.05; letter-spacing: 0; }
+.bigno small { display: block; font-size: 18px; font-weight: 600; margin-top: 6px; }
+.bigno .yr { font-size: 36px; font-weight: 400; }
+.ptitle { margin: 20px 0 10px; font-size: 24px; font-weight: 700; line-height: 1.3; padding-top: 14px; border-top: var(--bw) solid #0d0d0d; }
+.pmeta { display: flex; gap: 14px; flex-wrap: wrap; font-size: 13px; font-weight: 600; margin-bottom: 18px; }
+.badge { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 700; padding: 1px 8px; border: 2px solid currentColor; }
+.badge .ic { width: 12px; height: 12px; }
+.badge-ok { color: var(--green); } .badge-warn { color: var(--red); }
+.ftable { border-top: var(--bw) solid #0d0d0d; }
+.fv { display: grid; grid-template-columns: 110px minmax(0, 1fr) auto; gap: 0 10px; align-items: center; padding: 8px 0; border-bottom: 1px solid #0d0d0d; cursor: pointer; }
+.fv:hover, .fv.lit { background: #fff17a; }
+.fv-label { font-size: 11.5px; font-weight: 700; display: flex; align-items: center; gap: 4px; }
+.fv-value { font-size: 14px; font-weight: 500; }
+.fv[data-state="unreviewed"] .fv-value { text-decoration: underline wavy var(--red); text-underline-offset: 4px; }
+.fv[data-state="warn"] { background: #0d0d0d; color: var(--y); }
+.fv[data-state="warn"]:hover { background: #0d0d0d; }
+.fv-btn { height: 26px; padding: 0 8px; border: 2px solid #0d0d0d; background: none; font-size: 11px; font-weight: 700; cursor: pointer; opacity: 0; transition: opacity var(--fast); display: inline-flex; align-items: center; gap: 3px; white-space: nowrap; }
+.fv:hover .fv-btn, .fv:focus-within .fv-btn, .fv.lit .fv-btn { opacity: 1; }
+.fv-btn:hover { background: #0d0d0d; color: var(--y); }
+.fv[data-state="reviewed"] .fv-btn { opacity: 1; border: 0; color: var(--green); padding-inline: 0; }
+@media (hover: none) { .fv-btn { opacity: 1; } }
+.pactions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: auto; padding-top: 18px; }
+.btn { display: inline-flex; align-items: center; gap: 6px; height: 40px; padding: 0 14px; border: var(--bw) solid var(--ink); background: var(--paper); color: var(--ink); font-size: 13.5px; font-weight: 700; cursor: pointer; transition: background-color var(--fast), color var(--fast); }
+.btn:hover { background: var(--ink); color: var(--bg); }
+.panel .btn { border-color: #0d0d0d; background: none; color: #0d0d0d; }
+.panel .btn:hover { background: #0d0d0d; color: var(--y); }
+.panel .btn-primary { background: #0d0d0d; color: var(--y); }
+.panel .btn-primary:hover { background: #333; }
+.btn-primary { background: var(--ink); color: var(--bg); }
+.btn-ghost { border-color: transparent; background: none; }
+.btn-secondary { background: var(--y); color: #0d0d0d; }
+.btn-icon { width: 40px; padding: 0; justify-content: center; }
+.counter { font-size: 13px; font-weight: 700; margin-top: 10px; }
+
+.text { padding: 30px 36px 40px; min-width: 0; }
+.text h2 { margin: 0 0 18px; font-size: 13px; font-weight: 700; letter-spacing: 0; display: flex; align-items: center; gap: 10px; }
+.text h2::after { content: ""; flex: 1; height: var(--bw); background: var(--ink); }
+.summary { margin: 0 0 20px; padding: 14px 16px; border: var(--bw) solid var(--ink); background: var(--paper); font-size: 14.5px; line-height: 1.9; }
+.summary-head { display: flex; justify-content: space-between; align-items: center; }
+.ai-label { display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 700; color: var(--ink-3); }
+.ai-label .ic { width: 13px; height: 13px; }
+.para { position: relative; margin: 0; padding: 14px 0 14px 12px; font-family: var(--font-reading); font-size: 19px; line-height: 2; border-bottom: 1px solid var(--ink); border-inline-start: var(--bw) solid transparent; padding-inline-start: 14px; transition: border-color var(--fast), background-color var(--fast); max-width: 78ch; }
+.para:hover, .para.lit, .para.flash { border-inline-start-color: var(--y); background: var(--paper); }
+.pnum { font-family: var(--font-ui); font-size: 12px; font-weight: 700; margin-inline-end: 10px; background: var(--ink); color: var(--bg); padding: 1px 6px; }
+.cite { display: inline-flex; align-items: center; margin-inline: 2px; padding: 0 6px; border: 2px solid var(--ink); background: var(--y); color: #0d0d0d; font-family: var(--font-ui); font-size: 11.5px; font-weight: 700; line-height: 1.6; cursor: pointer; vertical-align: baseline; }
+.cite.unrev { border-style: dashed; background: none; color: var(--ink); }
+
+/* ---------- index (list) ---------- */
+.index { padding: 30px 36px 80px; }
+.index h1 { margin: 0 0 4px; font-size: clamp(40px, 6vw, 72px); font-weight: 700; line-height: 1; }
+.index .meta { font-weight: 600; margin: 0 0 22px; color: var(--ink-2); }
+.itbl { width: 100%; border-collapse: collapse; border-top: var(--bw) solid var(--ink); }
+.itbl th { text-align: start; font-size: 11.5px; font-weight: 700; padding: 10px 8px; border-bottom: var(--bw) solid var(--ink); }
+.itbl td { padding: 14px 8px; border-bottom: 1px solid var(--ink); vertical-align: middle; }
+.itbl tr[data-open] { cursor: pointer; }
+.itbl tr[data-open]:hover td { background: var(--y); color: #0d0d0d; }
+.itbl .no { font-size: 26px; font-weight: 700; white-space: nowrap; }
+.itbl .no small { font-size: 12px; font-weight: 600; color: var(--ink-3); margin-inline-start: 6px; }
+.itbl .ttl { font-weight: 700; font-size: 16px; }
+.itbl .sub { display: block; font-weight: 400; font-size: 12.5px; color: var(--ink-3); }
+.ipanel { padding: 26px 28px; display: flex; flex-direction: column; gap: 18px; }
+.stat { border-top: var(--bw) solid #0d0d0d; padding-top: 8px; }
+.stat b { display: block; font-size: 56px; line-height: 1; font-weight: 700; }
+.stat span { font-size: 13px; font-weight: 700; }
+.stamp { display: inline-flex; border: 2px solid var(--ink); font-size: 12px; font-weight: 700; }
+.stamp > span { padding: 2px 8px; } .stamp > span + span { border-inline-start: 2px solid var(--ink); }
+
+/* ---------- assistant overlay ---------- */
+.asbar { position: fixed; bottom: 0; inset-inline: 0; z-index: 30; display: flex; align-items: center; gap: 10px; height: 56px; padding: 0 18px; background: var(--ink); color: var(--bg); border-top: var(--bw) solid var(--y); cursor: pointer; }
+.asbar b { font-weight: 700; }
+.asbar .as-ctx { font-size: 12px; color: #aaa; margin-inline-start: auto; }
+.asbar .key { border: 1px solid #555; padding: 1px 6px; font-size: 11px; }
+.assist { position: fixed; inset: 55px 0 0 0; z-index: 25; background: var(--bg); display: grid; grid-template-columns: minmax(0, 1fr) var(--left-w); transform: translateY(100%); transition: transform var(--mid) var(--ease); visibility: hidden; }
+.app.assist-open .assist { transform: none; visibility: visible; }
+.as-main { display: flex; flex-direction: column; min-height: 0; border-inline-start: var(--bw) solid var(--ink); }
+.as-head { display: flex; align-items: center; gap: 10px; padding: 14px 24px; border-bottom: var(--bw) solid var(--ink); font-weight: 700; font-size: 18px; }
+.as-head .sp { flex: 1; }
+.as-log { flex: 1; overflow: auto; padding: 24px; display: flex; flex-direction: column; gap: 16px; max-width: 80ch; }
+.as-intro { margin: 0; font-weight: 500; }
+.sugg { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; }
+.sugg button { text-align: start; padding: 12px 14px; border: var(--bw) solid var(--ink); background: var(--paper); font-weight: 600; cursor: pointer; }
+.sugg button:hover { background: var(--y); color: #0d0d0d; }
+.msg-user { align-self: flex-end; padding: 8px 14px; border: var(--bw) solid var(--ink); background: var(--y); color: #0d0d0d; font-weight: 600; max-width: 85%; }
+.msg-ai { font-size: 16px; line-height: 1.9; }
+.thinking { display: flex; align-items: center; gap: 8px; font-weight: 600; color: var(--ink-3); }
+.pulse { width: 12px; height: 12px; background: var(--y); animation: pulse 600ms steps(2) infinite alternate; }
+@keyframes pulse { from { opacity: .1 } to { opacity: 1 } }
+.stopped { display: block; font-size: 12px; color: var(--ink-3); margin-top: 4px; }
+.ai-actions { margin-top: 10px; }
+.as-form { display: flex; gap: 0; border-top: var(--bw) solid var(--ink); }
+.as-form textarea { flex: 1; resize: none; field-sizing: content; min-height: 60px; max-height: 8rem; padding: 18px 24px; border: 0; background: var(--paper); font-size: 16px; line-height: 1.5; }
+.as-form .btn { height: auto; border: 0; border-inline-start: var(--bw) solid var(--ink); width: 72px; }
+.as-side { background: var(--y); color: #0d0d0d; padding: 26px 28px; display: flex; flex-direction: column; gap: 14px; }
+.as-side h3 { margin: 0; font-size: 28px; font-weight: 700; line-height: 1.2; }
+.as-side p { margin: 0; font-weight: 500; }
+.as-side .btn { align-self: flex-start; }
+
+/* ---------- compare ---------- */
+.cmp { width: min(720px, calc(100vw - 32px)); padding: 0; border: var(--bw) solid var(--ink); background: var(--paper); color: var(--ink); }
+.cmp::backdrop { background: rgb(13 13 13 / .6); }
+.cmp-head { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; border-bottom: var(--bw) solid var(--ink); }
+.cmp-head h2 { margin: 0; font-size: 20px; font-weight: 700; }
+.cmp-pick { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; padding: 12px 18px; font-size: 13px; font-weight: 600; }
+.cmp-pick button { border: 0; background: none; padding: 1px; cursor: pointer; }
+.cmp-pick button[aria-pressed="true"] .stamp { background: var(--y); color: #0d0d0d; }
+.cmp-tbl { width: 100%; border-collapse: collapse; font-size: 14px; }
+.cmp-tbl th, .cmp-tbl td { padding: 10px 18px; border-top: 1px solid var(--ink); text-align: start; vertical-align: top; }
+.cmp-tbl th { font-size: 12px; width: 22%; font-weight: 700; }
+.cmp-tbl tr[data-diff="yes"] td:last-child { background: var(--y); color: #0d0d0d; }
+.diff-tag { display: inline-flex; gap: 4px; align-items: center; font-size: 11px; font-weight: 700; }
+.cmp-foot { display: flex; justify-content: flex-end; gap: 8px; padding: 12px 18px; border-top: var(--bw) solid var(--ink); }
+.toasts { position: fixed; bottom: 70px; left: 50%; transform: translateX(-50%); z-index: 50; display: flex; flex-direction: column; gap: 6px; align-items: center; pointer-events: none; }
+.toast { padding: 8px 14px; background: var(--y); color: #0d0d0d; border: var(--bw) solid #0d0d0d; font-weight: 700; font-size: 13px; transition: opacity var(--fast); }
+.toast.out { opacity: 0; }
+.hub-link { position: fixed; bottom: 64px; inset-inline-end: 12px; z-index: 40; font-size: 11px; font-weight: 700; color: var(--ink); text-decoration: none; padding: 3px 8px; background: var(--paper); border: 2px solid var(--ink); }
+
+@media (max-width: 960px) {
+  .split, .assist { grid-template-columns: minmax(0, 1fr); }
+  .panel { position: static; height: auto; border-inline-start: 0; border-bottom: var(--bw) solid var(--ink); }
+  .bigno { font-size: 56px; }
+  .text, .index { padding: 20px 16px 100px; }
+  .para { font-size: 17px; }
+  .as-side { display: none; }
+  .as-main { border: 0; }
+  .strip nav button { padding: 0 12px; }
+}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: 0ms !important; animation-duration: 0ms !important; } }
+</style>
+</head>
+<body>
+<a class="hub-link" href="../">← التصاميم</a>
+<div id="stage"></div>
+<script src="../shared.js"></script>
+<script>
+(function () {
+  const Q = window.QADI; const { R, ORDER, S, svg, IC, NAV, counts, badge, stamp, fvHTML, assistEmptyHTML, ctxText, $, $$ } = Q;
+  function renderCard(r) {
+    const [d, t] = counts(r);
+    const fields = r.fields.map((f, idx) => fvHTML(r, f, idx, idx)).join('');
+    const paras = r.paras.map((txt, i) => `<p class="para" id="${r.id}-p${i}" data-r="${r.id}" data-p="${i}"><span class="pnum num">${String(i + 1).padStart(2, '0')}</span>${txt}</p>`).join('');
+    return `<div class="split">
+      <section class="text" aria-label="نص الحكم">
+        <h2>نص الحكم</h2>
+        <section class="summary" id="summary" hidden aria-label="ملخّص مولَّد"></section>
+        ${paras}
+      </section>
+      <aside class="panel" id="head">
+        <div class="panel-in">
+          <button class="back" data-action="list">← الفهرس</button>
+          <div class="bigno num" style="view-transition-name:stamp-${r.id}">${r.no}<span class="yr"> / ${r.year}</span><small>${r.circuit} · ${r.kind}</small></div>
+          <h1 class="ptitle">${r.title}</h1>
+          <div class="pmeta"><span>صدر <span class="num">${r.date}</span></span><span id="rc-badge">${badge(r)}</span></div>
+          <div class="ftable">${fields}</div>
+          <div class="counter num" id="rc-count">${d} من ${t} مراجَع</div>
+          <div class="pactions">
+            <button class="btn btn-primary" data-action="review-all" id="review-all" ${d === t ? 'hidden' : ''}>${svg(IC.check, 'ic-sm')}راجعت الكل</button>
+            <button class="btn" data-action="summarize">${svg(IC.sum, 'ic-sm')}لخّص</button>
+            <button class="btn" data-action="compare">${svg(IC.compare, 'ic-sm')}قارن</button>
+          </div>
+        </div>
+      </aside>
+    </div>`;
+  }
+  function renderList() {
+    const pending = ORDER.filter(id => { const [d, t] = counts(R[id]); return d < t; }).length;
+    const rows = ORDER.map(id => { const r = R[id]; const [d, t] = counts(r); const dispute = (r.fields.find(f => f.k === 'dispute') || {}).value || '';
+      return `<tr data-open="${id}" tabindex="0" aria-label="افتح ${r.title}"><td class="no"><span style="view-transition-name:stamp-${id}">${r.no}</span><small>${r.year} · ${r.circuit}</small></td><td><span class="ttl">${r.title}</span><span class="sub">${dispute} · ${r.kind}</span></td><td class="num">${r.date}</td><td>${badge(r)}</td><td class="num">${d}/${t}</td></tr>`; }).join('');
+    return `<div class="split">
+      <section class="index" aria-label="فهرس الأحكام">
+        <h1>الفهرس</h1><p class="meta"><span class="num">${ORDER.length}</span> أحكام · <span class="num">${pending}</span> بانتظار المراجعة</p>
+        <table class="itbl"><thead><tr><th>الطعن</th><th>الموضوع</th><th>الصدور</th><th>الحالة</th><th>المراجعة</th></tr></thead><tbody>${rows}</tbody></table>
+      </section>
+      <aside class="panel" id="head"><div class="ipanel">
+        <div class="stat"><b class="num">${ORDER.length}</b><span>أحكام مفهرسة</span></div>
+        <div class="stat"><b class="num">${pending}</b><span>بانتظار مراجعتك</span></div>
+        <div class="stat"><b class="num">3</b><span>مبادئ مستخرجة</span></div>
+        <div class="stat"><b class="num">1</b><span>تنبيه صياغة</span></div>
+        <button class="btn btn-primary" data-action="assist" style="margin-top:auto">${svg(IC.msg, 'ic-sm')}اسأل أحكامك</button>
+      </div></aside>
+    </div>`;
+  }
+  function shell() {
+    const dark = document.documentElement.dataset.theme === 'dark';
+    return `<div class="app" id="app">
+      <header class="strip">
+        <div class="brand"><i aria-hidden="true"></i>نظام القاضي</div>
+        <nav aria-label="التنقّل">${NAV.map(([k, l]) => `<button data-action="nav" data-to="${k}" ${k === 'rulings' ? 'aria-current="page"' : ''}>${l}</button>`).join('')}</nav>
+        <span class="sp"></span>
+        <button class="ib" data-action="theme" id="theme-btn" aria-label="${dark ? 'الوضع الفاتح' : 'الوضع الداكن'}">${svg(dark ? IC.sun : IC.moon)}</button>
+      </header>
+      <main id="main">${S.view === 'card' ? renderCard(R[S.rid]) : renderList()}</main>
+      <div class="asbar" data-action="assist" role="button" tabindex="0"><b>اسأل أحكامك</b><span>— كل جواب بفقرة مصدرها</span><span class="as-ctx" id="as-ctx">${ctxText()}</span><span class="key">⌘K</span></div>
+      <section class="assist" aria-label="المساعد">
+        <div class="as-main">
+          <div class="as-head">المساعد<span class="sp"></span><button class="btn btn-icon" data-action="assist" aria-label="أغلق">${svg(IC.x)}</button></div>
+          <div class="as-log" id="as-log" role="log">${assistEmptyHTML()}</div>
+          <form class="as-form" id="as-form"><label class="sr-only" for="as-input">اسأل</label><textarea id="as-input" rows="1" placeholder="اسأل عن أحكامك…"></textarea><button type="submit" class="btn btn-primary" id="as-send" data-mode="send" aria-label="أرسل">${svg(IC.up)}</button></form>
+        </div>
+        <aside class="as-side"><h3>يجيب من أحكامك فقط.</h3><p>ما لا يوجد في أرشيفك لن يُجاب عنه. كل جملة تحمل رقم الطعن والفقرة، وانقر الاستشهاد يأخذك إليها.</p><button class="btn" data-action="draft">افحص مسودة حكم</button></aside>
+      </section>
+    </div>`;
+  }
+  window.DESIGN = {
+    key: 'kham', shell, renderCard, renderList,
+    beforeAsk() { $('#app')?.classList.add('assist-open'); },
+    beforeCite() { $('#app')?.classList.remove('assist-open'); },
+    onTheme(dark) { const b = $('#theme-btn'); if (b) b.innerHTML = svg(dark ? IC.sun : IC.moon); }
+  };
+  document.addEventListener('keydown', e => { if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); $('#app').classList.add('assist-open'); $('#as-input')?.focus(); } if (e.key === 'Enter' && e.target.classList?.contains('asbar')) { $('#app').classList.add('assist-open'); } });
+  Q.initTheme(false);
+  Q.mountAll();
+})();
+</script>
+</body>
+</html>
