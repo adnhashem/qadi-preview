@@ -135,6 +135,35 @@ button, input, textarea { font: inherit; color: inherit; }
 .related button:hover { border-color: var(--accent-line); }
 .related small { color: var(--fg-3); font-size: 11px; }
 
+/* ---------- حيّ: النظام يُريك ما يفعله (منقول من المخطوط) ---------- */
+@keyframes rise { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+.pipe { display: flex; align-items: center; gap: 16px; min-height: 42px; padding: 8px 14px; margin-bottom: 18px; border: 1px solid var(--line); border-radius: var(--r); background: var(--bg); font-size: 12px; color: var(--fg-3); overflow-x: auto; }
+.pipe[hidden] { display: none; }
+.step { display: flex; align-items: center; gap: 8px; white-space: nowrap; transition: color var(--fast); }
+.step .dot { width: 16px; height: 16px; display: grid; place-items: center; border: 1.5px solid var(--line-2); border-radius: 50%; color: #fff; transition: background-color var(--fast), border-color var(--fast); }
+.step .dot .ic { width: 10px; height: 10px; opacity: 0; }
+.step.active { color: var(--fg); }
+.step.active .dot { border-color: var(--accent); animation: pulse 600ms var(--ease) infinite alternate; }
+.step.done { color: var(--fg); }
+.step.done .dot { background: var(--accent); border-color: var(--accent); animation: none; }
+.step.done .dot .ic { opacity: 1; }
+.pipe-bar { flex: 1; min-width: 3rem; height: 2px; background: var(--line); position: relative; overflow: hidden; border-radius: 1px; }
+.pipe-bar i { position: absolute; inset: 0; background: var(--accent); transform: scaleX(var(--prog, 0)); transform-origin: right; transition: transform 400ms var(--ease); }
+.pipe-done { display: flex; align-items: center; gap: 8px; flex: 1; color: var(--fg-2); white-space: nowrap; animation: rise var(--mid) var(--ease) both; }
+.pipe-done > .ic-sm { color: var(--ok); }
+.pipe-done .warn-n { color: var(--warn); font-weight: 600; }
+.pipe-done .replay { margin-inline-start: auto; height: 28px; font-size: 12px; }
+.reader.analyzing .para { opacity: .45; transition: opacity var(--fast), background-color var(--fast), border-color var(--fast); }
+.reader.analyzing .para.scanned { opacity: 1; }
+.reader .para.scanning { background: var(--accent-soft); border-inline-start-color: var(--accent); }
+.reader.analyzing .r-aside .fv, .reader.analyzing .related { opacity: 0; }
+.reader.analyzing .meter i { transform: scaleX(0); }
+.reader.revealed .r-aside .fv { animation: rise var(--fast) var(--ease) both; animation-delay: calc(min(var(--i), 12) * 40ms); }
+.reader.revealed .related { animation: rise var(--mid) var(--ease) both; animation-delay: 480ms; }
+.notice { padding: 10px 12px; font-size: 13.5px; line-height: 1.9; background: var(--bg); border: 1px solid var(--line); border-inline-start: 3px solid var(--warn); border-radius: 6px; animation: rise var(--mid) var(--ease) both; }
+.notice.clean { border-inline-start-color: var(--ok); }
+.notice p { margin: 4px 0 0; }
+
 /* ---------- assistant drawer ---------- */
 .assist { position: fixed; inset-block: 0; inset-inline-end: 0; width: min(400px, 100vw); z-index: 30; display: flex; flex-direction: column; background: var(--bg-2); border-inline-start: 1px solid var(--line); box-shadow: 0 0 40px rgb(0 0 0 / .18); transform: translateX(-100%); visibility: hidden; transition: transform var(--mid) var(--ease), visibility 0s linear var(--mid); }
 .app.assist-open .assist { transform: none; visibility: visible; transition: transform var(--mid) var(--ease); }
@@ -210,12 +239,59 @@ button, input, textarea { font: inherit; color: inherit; }
     const mine = principlesOf(r);
     return ORDER.filter(id => id !== r.id && principlesOf(R[id]).some(p => mine.includes(p)));
   }
+  /* ---------- حيّ: شريط التحليل عند فتح الحكم أول مرة ---------- */
+  const seen = new Set(); let ptimers = [];
+  const pl = (fn, ms) => ptimers.push(setTimeout(fn, ms));
+  const clearPipe = () => { ptimers.forEach(clearTimeout); ptimers = []; };
+  const anonCount = r => r.paras.join(' ').match(/\[[^\]]+\]/g)?.length || 0;
+  const nFields = n => n === 1 ? 'حقل واحد' : n === 2 ? 'حقلان' : n <= 10 ? `<span class="num">${n}</span> حقول` : `<span class="num">${n}</span> حقلاً`;
+  const nPrinciples = n => n === 0 ? 'بلا مبدأ' : n === 1 ? 'مبدأ واحد' : n === 2 ? 'مبدآن' : `<span class="num">${n}</span> مبادئ`;
+  const warnOf = r => r.fields.find(f => f.state === 'warn');
+  function pipeStepsHTML(r) {
+    const a = anonCount(r); const [, t] = counts(r);
+    return `<span class="step"><span class="dot">${svg(IC.check)}</span><span>استخراج النص</span></span>
+      <span class="step"><span class="dot">${svg(IC.check)}</span><span>التجهيل · ${a ? `<span class="num">${a}</span> اسم` : 'لا أسماء أفراد'}</span></span>
+      <span class="step"><span class="dot">${svg(IC.check)}</span><span>استخراج الحقول · <span class="num">${t}</span></span></span>
+      <span class="pipe-bar"><i></i></span>`;
+  }
+  function pipeDoneHTML(r) {
+    const [, t] = counts(r); const w = warnOf(r);
+    return `<span class="pipe-done">${svg(IC.check, 'ic-sm')}<span>اكتمل التحليل: ${nFields(t)} · ${nPrinciples(principlesOf(r).length)} · ${w ? `<span class="warn-n">تنبيه صياغة واحد</span> ${Q.citeHTML(r.id, w.p)}` : 'بلا تنبيهات صياغة'}</span>
+      <button class="btn btn-ghost replay" data-action="replay">أعد عرض التحليل</button></span>`;
+  }
+  function addNotice(r) {
+    const log = $('#as-log'); if (!log || $(`#notice-${r.id}`)) return;
+    const [, t] = counts(r); const w = warnOf(r);
+    const div = document.createElement('div'); div.className = 'notice' + (w ? '' : ' clean'); div.id = `notice-${r.id}`; div.dir = 'rtl';
+    div.innerHTML = `<span class="ai-label">${svg(IC.info)}مولَّد — راجع الاستشهادات</span>
+      <p>اكتمل تحليل الطعن <span class="num">${r.no}/${r.year}</span>: ${nFields(t)} و${nPrinciples(principlesOf(r).length)}${w ? `، و<strong>تنبيه صياغة</strong> واحد ${Q.citeHTML(r.id, w.p)} — ${w.value}.` : '، بلا تنبيهات صياغة.'}</p>`;
+    log.prepend(div);
+  }
+  function runPipeline() {
+    clearPipe();
+    const head = $('#head'); const pipe = $('#pipeline');
+    if (S.view !== 'card' || !head?.classList.contains('reader') || !pipe) return;
+    const r = R[S.rid];
+    if (seen.has(r.id)) return;
+    seen.add(r.id);
+    if (Q.reduced()) { pipe.innerHTML = pipeDoneHTML(r); addNotice(r); return; }
+    pipe.innerHTML = pipeStepsHTML(r);
+    head.classList.remove('revealed'); head.classList.add('analyzing');
+    const steps = $$('.step', pipe); const bar = $('.pipe-bar i', pipe); const paras = $$('.para', head);
+    const setStep = i => { steps.forEach((s, j) => { s.classList.toggle('done', j < i); s.classList.toggle('active', j === i); }); bar.style.setProperty('--prog', String(Math.min(i / steps.length, 1))); };
+    setStep(0); pl(() => setStep(1), 380); pl(() => setStep(2), 760);
+    paras.forEach((p, i) => pl(() => { p.classList.add('scanned', 'scanning'); pl(() => p.classList.remove('scanning'), 160); }, 800 + i * 90));
+    const end = 800 + paras.length * 90 + 120;
+    pl(() => { setStep(3); head.classList.remove('analyzing'); head.classList.add('revealed'); paras.forEach(p => p.classList.remove('scanned')); Q.announce('اكتمل تحليل الحكم'); }, end);
+    pl(() => { pipe.innerHTML = pipeDoneHTML(r); addNotice(r); }, end + 900);
+  }
+
   function renderCard(r) {
     const [d, t] = counts(r);
     const fields = r.fields.map((f, idx) => fvHTML(r, f, idx, idx)).join('');
     const paras = r.paras.map((txt, i) => `<p class="para" id="${r.id}-p${i}" data-r="${r.id}" data-p="${i}"><span class="pnum num">${i + 1}</span>${txt}</p>`).join('');
     const rel = related(r).map(id => `<button data-open="${id}"><span>${R[id].title}</span><small>${R[id].no}/${R[id].year} · ${principlesOf(R[id]).find(p => principlesOf(r).includes(p))}</small></button>`).join('') || '<small style="color:var(--fg-3)">لا أحكام تشاركه مبدأً</small>';
-    return `<div class="reader" id="head">
+    return `<div class="reader${seen.has(r.id) || Q.reduced() ? '' : ' analyzing'}" id="head">
       <article class="r-main" aria-label="نص الحكم">
         <button class="crumb" data-action="list">${svg(IC.back, 'ic-sm')} النتائج</button>
         <h1>${r.title}</h1>
@@ -226,6 +302,7 @@ button, input, textarea { font: inherit; color: inherit; }
           <button class="btn" data-action="compare">${svg(IC.compare, 'ic-sm')}قارن مع…</button>
           <button class="btn btn-ghost" data-action="assist">${svg(IC.msg, 'ic-sm')}اسأل عن هذا الحكم</button>
         </div>
+        <div class="pipe" id="pipeline" aria-live="polite">${seen.has(r.id) ? pipeDoneHTML(r) : pipeStepsHTML(r)}</div>
         <section class="summary" id="summary" hidden aria-label="ملخّص مولَّد"></section>
         ${paras}
       </article>
@@ -281,6 +358,9 @@ button, input, textarea { font: inherit; color: inherit; }
   }
   window.DESIGN = {
     key: 'muharrik', shell, renderCard, renderList,
+    afterMount() { runPipeline(); },
+    afterView() { runPipeline(); },
+    onAction(act) { if (act !== 'replay') return false; seen.delete(S.rid); Q.setView('card', S.rid); return true; },
     beforeAsk() { $('#app')?.classList.add('assist-open'); },
     beforeCite() { if (matchMedia('(max-width: 900px)').matches) $('#app')?.classList.remove('assist-open'); },
     onTheme(dark) { const b = $('#theme-btn'); if (b) { b.innerHTML = svg(dark ? IC.sun : IC.moon); b.setAttribute('aria-label', dark ? 'الوضع الفاتح' : 'الوضع الداكن'); } }
