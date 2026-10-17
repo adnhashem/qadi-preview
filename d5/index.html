@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>السلسلة — نظام القاضي</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* ===== السلسلة — نمط vLex Vincent: تحليل الحكم (المسألة · الخلاصة) وسلسلة المبدأ عبر الأحكام ===== */
+:root {
+  color-scheme: light;
+  --bg: #fbfbf9; --bg-2: #ffffff; --bg-3: #f1f2ee;
+  --line: #e3e5df; --line-2: #c9ccc3;
+  --fg: #151a17; --fg-2: #434a45; --fg-3: #737a75;
+  --accent: #0f6e5a; --accent-2: #0b5546; --accent-soft: #e4f1ec; --accent-line: #9fcdbd;
+  --ink: #1d3b6b; --ink-soft: #e7edf7;
+  --ok: #0f6e5a; --warn: #9a6400; --unrev: #b4541a; --unrev-soft: #fff1e8;
+  --font-ui: 'IBM Plex Sans Arabic', system-ui, sans-serif;
+  --font-reading: 'Noto Naskh Arabic', serif;
+  --r: 12px; --r-sm: 8px; --ease: cubic-bezier(0.2, 0, 0, 1); --fast: 150ms; --mid: 280ms;
+  --rail: 232px; --head-h: 60px;
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #141715; --bg-2: #1b1f1c; --bg-3: #242925; --line: #2c322e; --line-2: #3f463f;
+  --fg: #ebeee9; --fg-2: #b3b9b3; --fg-3: #838a84;
+  --accent: #6cc9ad; --accent-2: #8ad8c1; --accent-soft: #1d3a31; --accent-line: #2f6b57;
+  --ink: #9db8e4; --ink-soft: #1f2a3b;
+  --ok: #6cc9ad; --warn: #e4b64c; --unrev: #e6905f; --unrev-soft: #2e241d;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font-ui); font-size: 15px; line-height: 1.65; -webkit-font-smoothing: antialiased; }
+button, input, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.ic { width: 18px; height: 18px; flex: none; } .ic-sm { width: 14px; height: 14px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.num { font-variant-numeric: tabular-nums; }
+
+.app { display: grid; grid-template-columns: var(--rail) minmax(0, 1fr); min-height: 100dvh; }
+.rail { position: sticky; top: 0; height: 100dvh; display: flex; flex-direction: column; padding: 16px 12px; border-inline-end: 1px solid var(--line); background: var(--bg-2); }
+.brand { display: flex; align-items: center; gap: 10px; padding: 4px 8px 18px; font-weight: 600; }
+.brand-mark { width: 28px; height: 28px; border-radius: 8px; background: var(--accent); color: #fff; display: grid; place-items: center; }
+.nav-item { display: flex; align-items: center; gap: 10px; width: 100%; height: 38px; padding: 0 10px; border: 0; border-radius: var(--r-sm); background: none; color: var(--fg-2); text-align: start; cursor: pointer; font-size: 14px; transition: background-color var(--fast); }
+.nav-item:hover { background: var(--bg-3); color: var(--fg); }
+.nav-item[aria-current] { background: var(--accent-soft); color: var(--accent-2); font-weight: 600; }
+.rail-foot { margin-top: auto; }
+.rail-stat { padding: 12px; margin-top: 14px; border: 1px solid var(--line); border-radius: var(--r-sm); background: var(--bg); font-size: 12px; color: var(--fg-3); display: grid; gap: 4px; }
+.rail-stat b { font-size: 20px; color: var(--fg); font-weight: 600; }
+
+.main { min-width: 0; }
+.hdr { position: sticky; top: 0; z-index: 10; height: var(--head-h); display: flex; align-items: center; gap: 10px; padding: 0 28px; background: color-mix(in srgb, var(--bg) 90%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+.crumb { display: inline-flex; align-items: center; gap: 4px; color: var(--fg-3); font-size: 13px; background: none; border: 0; padding: 0; cursor: pointer; }
+.crumb:hover { color: var(--accent); }
+.hdr .sp { flex: 1; }
+.ib { width: 36px; height: 36px; display: grid; place-items: center; border: 0; background: none; color: var(--fg-2); border-radius: var(--r-sm); cursor: pointer; }
+.ib:hover { background: var(--bg-3); }
+.btn { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 14px; border: 1px solid var(--line-2); border-radius: 999px; background: var(--bg-2); color: var(--fg); font-size: 13.5px; font-weight: 500; cursor: pointer; transition: background-color var(--fast); white-space: nowrap; }
+.btn:hover { background: var(--bg-3); }
+.btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; } .btn-primary:hover { background: var(--accent-2); }
+.btn-ghost { border-color: transparent; background: none; color: var(--fg-2); }
+.btn-secondary { border-color: var(--accent); color: var(--accent); }
+.btn-icon { width: 36px; padding: 0; justify-content: center; }
+
+/* ---------- analysis header ---------- */
+.wrap { max-width: 1180px; margin: 0 auto; padding: 28px 28px 100px; }
+.analysis { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 18px; margin-bottom: 22px; }
+.an-main { background: var(--bg-2); border: 1px solid var(--line); border-radius: var(--r); padding: 22px 24px; }
+.an-top { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; font-size: 12px; color: var(--fg-3); }
+.stamp { display: inline-flex; border: 1px solid var(--accent-line); border-radius: 6px; font-size: 12px; font-weight: 600; color: var(--accent-2); background: var(--accent-soft); }
+.stamp > span { padding: 3px 9px; } .stamp > span + span { border-inline-start: 1px solid var(--accent-line); }
+.an-main h1 { margin: 0 0 12px; font-size: 26px; font-weight: 600; line-height: 1.35; text-wrap: balance; }
+.issue { display: grid; gap: 10px; }
+.issue-row { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 10px; align-items: start; }
+.issue-row b { font-size: 12px; color: var(--fg-3); font-weight: 600; padding-top: 3px; }
+.issue-row .v { font-size: 15px; }
+.issue-row .v.q { font-family: var(--font-reading); font-size: 17px; line-height: 1.8; }
+.badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; padding: 2px 9px; border-radius: 999px; }
+.badge .ic { width: 12px; height: 12px; }
+.badge-ok { color: var(--ok); background: var(--accent-soft); }
+.badge-warn { color: var(--unrev); background: var(--unrev-soft); }
+.an-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 18px; }
+.an-side { display: grid; gap: 12px; align-content: start; }
+.card { background: var(--bg-2); border: 1px solid var(--line); border-radius: var(--r); padding: 16px 18px; }
+.card h3 { margin: 0 0 10px; font-size: 12px; color: var(--fg-3); font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
+.fv { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0 8px; padding: 7px 8px; margin: 0 -8px; border-radius: var(--r-sm); cursor: pointer; transition: background-color var(--fast); }
+.fv:hover, .fv.lit { background: var(--accent-soft); }
+.fv-label { grid-column: 1; font-size: 11px; color: var(--fg-3); font-weight: 600; display: flex; align-items: center; gap: 4px; }
+.fv-value { grid-column: 1; font-size: 14px; }
+.fv[data-state="unreviewed"] .fv-value { color: var(--unrev); }
+.fv[data-state="unreviewed"] .fv-label::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--unrev); }
+.fv[data-state="warn"] { background: color-mix(in srgb, var(--warn) 8%, transparent); }
+.fv[data-state="warn"] .fv-label { color: var(--warn); }
+.fv-btn { grid-column: 2; grid-row: 1 / 3; align-self: center; height: 26px; padding: 0 9px; border: 1px solid var(--line-2); border-radius: 999px; background: var(--bg-2); font-size: 11px; font-weight: 600; cursor: pointer; opacity: 0; transition: opacity var(--fast); display: inline-flex; align-items: center; gap: 3px; white-space: nowrap; }
+.fv:hover .fv-btn, .fv:focus-within .fv-btn, .fv.lit .fv-btn { opacity: 1; }
+.fv-btn:hover { border-color: var(--accent); color: var(--accent); }
+.fv[data-state="reviewed"] .fv-btn { opacity: 1; border-color: transparent; color: var(--ok); padding-inline: 0; }
+@media (hover: none) { .fv-btn { opacity: 1; } }
+
+/* ---------- principle chain ---------- */
+.chain { background: var(--bg-2); border: 1px solid var(--line); border-radius: var(--r); padding: 18px 22px; margin-bottom: 22px; }
+.chain h2 { margin: 0 0 4px; font-size: 15px; font-weight: 600; }
+.chain p.sub { margin: 0 0 14px; font-size: 13px; color: var(--fg-3); }
+.track { position: relative; display: flex; gap: 14px; overflow-x: auto; padding: 16px 4px 8px; }
+.track::before { content: ""; position: absolute; inset-inline: 20px; top: 32px; height: 2px; background: var(--line-2); }
+.node { position: relative; flex: none; width: 220px; display: grid; gap: 6px; padding: 24px 12px 12px; border: 1px solid var(--line); border-radius: var(--r-sm); background: var(--bg); cursor: pointer; transition: border-color var(--fast), transform var(--fast); animation: rise var(--mid) var(--ease) both; animation-delay: calc(var(--i) * 70ms); }
+.node:hover { border-color: var(--accent-line); transform: translateY(-2px); }
+.node::before { content: ""; position: absolute; top: 10px; inset-inline-start: 50%; width: 12px; height: 12px; border-radius: 50%; background: var(--bg-2); border: 2px solid var(--line-2); transform: translateX(50%); }
+.node.cur { border-color: var(--accent); background: var(--accent-soft); }
+.node.cur::before { background: var(--accent); border-color: var(--accent); }
+.node .d { font-size: 11px; color: var(--fg-3); }
+.node .t { font-size: 13.5px; font-weight: 600; line-height: 1.4; }
+.node .o { font-size: 12px; color: var(--fg-2); }
+.node .o.diff { color: var(--warn); }
+.chain-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 4px; }
+.chain-tabs button { height: 30px; padding: 0 12px; border: 1px solid var(--line-2); border-radius: 999px; background: var(--bg); font-size: 12.5px; cursor: pointer; }
+.chain-tabs button[aria-pressed="true"] { background: var(--ink-soft); border-color: var(--ink); color: var(--ink); font-weight: 600; }
+@keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+/* ---------- text ---------- */
+.text { background: var(--bg-2); border: 1px solid var(--line); border-radius: var(--r); padding: 24px 28px 40px; }
+.text h2 { margin: 0 0 14px; font-size: 13px; color: var(--fg-3); font-weight: 600; }
+.summary { padding: 14px 16px; margin-bottom: 16px; border: 1px solid var(--accent-line); border-inline-start: 4px solid var(--accent); border-radius: var(--r-sm); background: var(--accent-soft); font-size: 14px; line-height: 1.9; }
+.summary-head { display: flex; justify-content: space-between; align-items: center; }
+.ai-label { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: var(--fg-3); font-weight: 600; }
+.ai-label .ic { width: 13px; height: 13px; }
+.para { margin: 0 0 2px; padding: 8px 12px 8px 8px; font-family: var(--font-reading); font-size: 17.5px; line-height: 2; border-radius: var(--r-sm); border-inline-start: 3px solid transparent; transition: background-color var(--fast), border-color var(--fast); max-width: 76ch; }
+.para:hover, .para.lit { background: var(--accent-soft); border-inline-start-color: var(--accent); }
+.para.flash { background: var(--accent-soft); border-inline-start-color: var(--accent); }
+.pnum { font-family: var(--font-ui); font-size: 11px; color: var(--fg-3); margin-inline-end: 8px; }
+
+/* ---------- list ---------- */
+.list-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 18px; }
+.list-head h1 { margin: 0; font-size: 24px; font-weight: 600; }
+.list-head .cnt { color: var(--fg-3); font-size: 13px; }
+.groups { display: grid; gap: 18px; }
+.group { background: var(--bg-2); border: 1px solid var(--line); border-radius: var(--r); padding: 16px 20px; }
+.group h2 { margin: 0 0 4px; font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+.group h2 .n { font-size: 11px; color: var(--ink); background: var(--ink-soft); padding: 1px 8px; border-radius: 999px; font-weight: 600; }
+.group p { margin: 0 0 10px; font-size: 13px; color: var(--fg-3); }
+.grow { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; }
+.rc { display: grid; gap: 4px; padding: 12px 14px; border: 1px solid var(--line); border-radius: var(--r-sm); background: var(--bg); cursor: pointer; transition: border-color var(--fast), transform var(--fast); }
+.rc:hover { border-color: var(--accent-line); transform: translateY(-1px); }
+.rc .t { font-weight: 600; font-size: 14px; }
+.rc .s { display: flex; justify-content: space-between; font-size: 12px; color: var(--fg-3); align-items: center; }
+
+/* ---------- assistant bottom sheet ---------- */
+.assist { position: fixed; inset-inline: var(--rail) 0; bottom: 0; z-index: 30; height: min(520px, 70dvh); display: flex; flex-direction: column; background: var(--bg-2); border-top: 1px solid var(--line); border-radius: var(--r) var(--r) 0 0; box-shadow: 0 -20px 60px rgb(0 0 0 / .14); transform: translateY(calc(100% - 56px)); transition: transform var(--mid) var(--ease); }
+.app.assist-open .assist { transform: none; }
+.as-head { height: 56px; display: flex; align-items: center; gap: 10px; padding: 0 20px; cursor: pointer; font-weight: 600; }
+.as-head .grab { width: 36px; height: 4px; border-radius: 2px; background: var(--line-2); position: absolute; top: 8px; inset-inline-start: 50%; transform: translateX(50%); }
+.as-ctx { margin-inline-start: auto; font-size: 12px; color: var(--fg-3); font-weight: 400; }
+.as-body { display: grid; grid-template-columns: minmax(0, 1fr) 280px; min-height: 0; flex: 1; border-top: 1px solid var(--line); }
+.as-log { overflow: auto; padding: 16px 20px; display: flex; flex-direction: column; gap: 12px; min-height: 0; }
+.as-side { border-inline-start: 1px solid var(--line); padding: 16px; display: flex; flex-direction: column; gap: 10px; overflow: auto; }
+.as-side h4 { margin: 0; font-size: 12px; color: var(--fg-3); font-weight: 600; }
+.as-intro { margin: 0; color: var(--fg-2); font-size: 14px; }
+.sugg { display: flex; flex-direction: column; gap: 6px; }
+.sugg button { text-align: start; padding: 9px 12px; border: 1px solid var(--line); border-radius: var(--r-sm); background: var(--bg); font-size: 13px; cursor: pointer; }
+.sugg button:hover { border-color: var(--accent-line); }
+.msg-user { align-self: flex-end; max-width: 80%; padding: 8px 14px; background: var(--bg-3); border-radius: 14px 14px 2px 14px; font-size: 14px; }
+.msg-ai { font-size: 14.5px; line-height: 1.9; max-width: 70ch; }
+.thinking { display: flex; align-items: center; gap: 8px; color: var(--fg-3); font-size: 13px; }
+.pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); animation: pulse 900ms var(--ease) infinite alternate; }
+@keyframes pulse { from { opacity: .2 } to { opacity: 1 } }
+.stopped { display: block; color: var(--fg-3); font-size: 11px; margin-top: 4px; }
+.ai-actions { margin-top: 8px; }
+.cite { display: inline-flex; align-items: center; margin-inline: 2px; padding: 0 7px; border: 1px solid var(--accent-line); border-radius: 999px; background: var(--accent-soft); color: var(--accent-2); font-size: 11.5px; font-weight: 600; line-height: 1.7; cursor: pointer; vertical-align: baseline; }
+.cite:hover { background: var(--accent-line); }
+.cite.unrev { border-color: var(--unrev); color: var(--unrev); background: var(--unrev-soft); }
+.as-form { display: flex; gap: 8px; padding: 10px 20px 14px; border-top: 1px solid var(--line); align-items: flex-end; }
+.as-form textarea { flex: 1; resize: none; field-sizing: content; min-height: 36px; max-height: 7rem; padding: 8px 14px; border: 1px solid var(--line-2); border-radius: 999px; background: var(--bg); font-size: 14px; line-height: 1.5; }
+
+/* ---------- compare ---------- */
+.cmp { width: min(680px, calc(100vw - 32px)); padding: 0; border: 1px solid var(--line); border-radius: var(--r); background: var(--bg-2); color: var(--fg); box-shadow: 0 20px 60px rgb(0 0 0 / .22); }
+.cmp::backdrop { background: rgb(21 26 23 / .4); }
+.cmp-head { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; border-bottom: 1px solid var(--line); }
+.cmp-head h2 { margin: 0; font-size: 16px; }
+.cmp-pick { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; padding: 12px 18px; font-size: 13px; color: var(--fg-3); }
+.cmp-pick button { border: 0; background: none; padding: 1px; cursor: pointer; }
+.cmp-pick button[aria-pressed="true"] .stamp { border-color: var(--accent); }
+.cmp-tbl { width: 100%; border-collapse: collapse; font-size: 14px; }
+.cmp-tbl th, .cmp-tbl td { padding: 10px 18px; border-top: 1px solid var(--line); text-align: start; vertical-align: top; }
+.cmp-tbl th { color: var(--fg-3); font-size: 12px; width: 22%; font-weight: 600; }
+.cmp-tbl tr[data-diff="yes"] td:last-child { color: var(--warn); }
+.diff-tag { display: inline-flex; gap: 4px; align-items: center; font-size: 11px; color: var(--warn); }
+.cmp-foot { display: flex; justify-content: flex-end; gap: 6px; padding: 12px 18px; border-top: 1px solid var(--line); }
+.toasts { position: fixed; bottom: 70px; left: 50%; transform: translateX(-50%); z-index: 50; display: flex; flex-direction: column; gap: 6px; align-items: center; pointer-events: none; }
+.toast { padding: 8px 14px; border-radius: 999px; background: var(--fg); color: var(--bg); font-size: 13px; transition: opacity var(--fast); }
+.toast.out { opacity: 0; }
+.hub-link { position: fixed; bottom: 64px; inset-inline-end: 12px; z-index: 40; font-size: 11px; color: var(--fg-3); text-decoration: none; padding: 3px 8px; border-radius: 999px; background: var(--bg-2); border: 1px solid var(--line); }
+
+@media (max-width: 1100px) { .analysis { grid-template-columns: minmax(0, 1fr); } .as-body { grid-template-columns: minmax(0, 1fr); } .as-side { display: none; } }
+@media (max-width: 820px) {
+  .app { grid-template-columns: minmax(0, 1fr); }
+  .rail { position: fixed; bottom: 0; inset-inline: 0; height: auto; flex-direction: row; align-items: center; gap: 2px; padding: 6px 8px; border: 0; border-top: 1px solid var(--line); z-index: 35; }
+  .brand, .rail-stat, .rail-foot .lbl { display: none; }
+  .nav-item { width: auto; flex: 1; justify-content: center; padding: 0; }
+  .nav-item .lbl { display: none; }
+  .rail-foot { margin: 0; }
+  .assist { inset-inline: 0; bottom: 56px; }
+  .wrap { padding: 16px 14px 140px; }
+  .hdr { padding: 8px 14px; height: auto; flex-wrap: wrap; row-gap: 6px; }
+  .hdr .btn { height: 32px; padding: 0 10px; font-size: 12.5px; }
+  .an-main { padding: 16px; } .an-main h1 { font-size: 21px; }
+  .issue-row { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .text { padding: 16px; }
+  .hub-link { bottom: 120px; }
+}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: 0ms !important; animation-duration: 0ms !important; } }
+</style>
+</head>
+<body>
+<a class="hub-link" href="../">← التصاميم</a>
+<div id="stage"></div>
+<script src="../shared.js"></script>
+<script>
+(function () {
+  const Q = window.QADI; const { R, ORDER, S, svg, IC, NAV, counts, badge, stamp, fvHTML, assistEmptyHTML, ctxText, $, $$ } = Q;
+  const g = (r, k) => (r.fields.find(f => f.k === k) || {}).value || '—';
+  const principlesOf = r => r.fields.filter(f => f.k === 'principle').map(f => f.value);
+  const ALLP = [...new Set(ORDER.flatMap(id => principlesOf(R[id])))];
+  const CH = { p: null };
+  function chainHTML(r) {
+    const mine = principlesOf(r); if (!mine.length) return '';
+    const p = CH.p && mine.includes(CH.p) ? CH.p : mine[0];
+    const nodes = ORDER.filter(id => principlesOf(R[id]).includes(p)).sort((a, b) => R[a].year - R[b].year);
+    const base = g(R[nodes[0]], 'winner');
+    return `<section class="chain" aria-label="سلسلة المبدأ">
+      <h2>سلسلة المبدأ عبر أحكامك</h2><p class="sub">كيف طبّقت هذا المبدأ عبر السنوات — واللون الأصفر يعني نتيجة مختلفة عن أول حكم في السلسلة.</p>
+      <div class="chain-tabs">${mine.map(x => `<button data-chain="${x}" aria-pressed="${x === p}">${x}</button>`).join('')}</div>
+      <div class="track">${nodes.map((id, i) => { const n = R[id]; const w = g(n, 'winner'); return `<div class="node ${id === r.id ? 'cur' : ''}" data-open="${id}" tabindex="0" style="--i:${i}" aria-label="افتح ${n.title}"><span class="d num">${n.no}/${n.year} · ${n.date}</span><span class="t">${n.title}</span><span class="o ${w !== base ? 'diff' : ''}">${w !== '—' ? 'لصالح ' + w : g(n, 'disposition')}${id === r.id ? ' · الحالي' : ''}</span></div>`; }).join('')}</div>
+    </section>`;
+  }
+  function renderCard(r) {
+    const [d, t] = counts(r);
+    const fields = r.fields.map((f, idx) => fvHTML(r, f, idx, idx)).join('');
+    const paras = r.paras.map((txt, i) => `<p class="para" id="${r.id}-p${i}" data-r="${r.id}" data-p="${i}"><span class="pnum num">${i + 1}</span>${txt}</p>`).join('');
+    const issuePara = r.fields.find(f => f.k === 'principle')?.p ?? 2;
+    return `<div class="hdr" id="head"><button class="crumb" data-action="list">${svg(IC.back, 'ic-sm')} الأحكام</button><span class="sp"></span>
+        <button class="btn btn-ghost" data-action="summarize">${svg(IC.sum, 'ic-sm')}لخّص</button>
+        <button class="btn btn-ghost" data-action="compare">${svg(IC.compare, 'ic-sm')}قارن مع…</button>
+        <button class="btn btn-primary" data-action="review-all" id="review-all" ${d === t ? 'hidden' : ''}>${svg(IC.check, 'ic-sm')}راجعت الكل</button>
+        <button class="ib" data-action="theme" id="theme-btn" aria-label="الوضع">${svg(document.documentElement.dataset.theme === 'dark' ? IC.sun : IC.moon)}</button></div>
+      <div class="wrap">
+        <div class="analysis">
+          <section class="an-main" aria-label="تحليل الحكم">
+            <div class="an-top">${stamp(r, 'sm', true)}<span>${r.kind}</span><span>·</span><span class="num">${r.date}</span><span id="rc-badge">${badge(r)}</span></div>
+            <h1>${r.title}</h1>
+            <div class="issue">
+              <div class="issue-row"><b>المسألة</b><div class="v">${g(r, 'dispute')} — ${g(r, 'prior')}</div></div>
+              <div class="issue-row"><b>المقرَّر</b><div class="v q">${r.paras[issuePara]}</div></div>
+              <div class="issue-row"><b>الحسم</b><div class="v">${g(r, 'disposition')}${g(r, 'winner') !== '—' ? ' · لصالح ' + g(r, 'winner') : ''}</div></div>
+            </div>
+            <div class="an-actions"><button class="btn" data-action="assist">${svg(IC.msg, 'ic-sm')}اسأل عن هذا الحكم</button><button class="btn btn-ghost" data-action="draft">افحص مسودة عليه</button></div>
+          </section>
+          <aside class="an-side"><div class="card"><h3>الحقول المستخرجة <span class="num" id="rc-count">${d} من ${t} مراجَع</span></h3>${fields}</div></aside>
+        </div>
+        <div id="chain">${chainHTML(r)}</div>
+        <section class="text" aria-label="نص الحكم"><h2>النص الكامل</h2><section class="summary" id="summary" hidden aria-label="ملخّص مولَّد"></section>${paras}</section>
+      </div>`;
+  }
+  function renderList() {
+    const pending = ORDER.filter(id => { const [d, t] = counts(R[id]); return d < t; }).length;
+    const groups = ALLP.map(p => { const ids = ORDER.filter(id => principlesOf(R[id]).includes(p)); const wins = ids.map(id => g(R[id], 'winner'));
+      return `<section class="group"><h2>${p}<span class="n num">${ids.length} ${ids.length > 2 ? 'أحكام' : 'حكمان'}</span></h2><p>${[...new Set(wins)].length === 1 && wins[0] !== '—' ? 'اتجاه ثابت: لصالح ' + wins[0] : 'اتجاهات مختلفة — يستحق الفحص'}</p>
+        <div class="grow">${ids.map(id => { const r = R[id]; const [d, t] = counts(r); return `<div class="rc" tabindex="0" data-open="${id}" aria-label="افتح ${r.title}"><div>${stamp(r, 'sm', false)}</div><div class="t">${r.title}</div><div class="s"><span class="num">${r.date}</span>${badge(r)}</div></div>`; }).join('')}</div></section>`; }).join('');
+    return `<div class="hdr" id="head"><span style="font-weight:600">الأحكام مرتّبة بالمبدأ</span><span class="sp"></span><button class="ib" data-action="theme" id="theme-btn" aria-label="الوضع">${svg(document.documentElement.dataset.theme === 'dark' ? IC.sun : IC.moon)}</button></div>
+      <div class="wrap"><div class="list-head"><h1>المبادئ</h1><span class="cnt"><span class="num">${ALLP.length}</span> مبادئ · <span class="num">${ORDER.length}</span> أحكام · <span class="num">${pending}</span> بانتظار المراجعة</span></div><div class="groups">${groups}</div></div>`;
+  }
+  function shell() {
+    return `<div class="app" id="app">
+      <nav class="rail" aria-label="التنقّل">
+        <div class="brand"><span class="brand-mark" aria-hidden="true">ق</span><span>نظام القاضي</span></div>
+        ${NAV.map(([k, l]) => `<button class="nav-item" data-action="nav" data-to="${k}" aria-label="${l}" ${k === 'rulings' ? 'aria-current="page"' : ''}>${svg(IC[k])}<span class="lbl">${l}</span></button>`).join('')}
+        <div class="rail-stat"><span>المبادئ المفهرسة</span><b class="num">${ALLP.length}</b><span>في <span class="num">${ORDER.length}</span> أحكام</span></div>
+        <div class="rail-foot"></div>
+      </nav>
+      <main class="main" id="main">${S.view === 'card' ? renderCard(R[S.rid]) : renderList()}</main>
+      <section class="assist" id="assist" aria-label="المساعد">
+        <div class="as-head" data-action="assist"><span class="grab" aria-hidden="true"></span>${svg(IC.spark)}اسأل أحكامك<span class="as-ctx" id="as-ctx">${ctxText()}</span></div>
+        <div class="as-body">
+          <div class="as-log" id="as-log" role="log">${assistEmptyHTML()}</div>
+          <aside class="as-side"><h4>أدوات</h4><button class="btn btn-secondary" data-action="draft">افحص مسودة</button><h4>المبادئ في السياق</h4>${ALLP.map(p => `<span style="font-size:12.5px;color:var(--fg-2)">• ${p}</span>`).join('')}</aside>
+        </div>
+        <form class="as-form" id="as-form"><label class="sr-only" for="as-input">اسأل</label><textarea id="as-input" rows="1" placeholder="اسأل عن أحكامك…"></textarea><button type="submit" class="btn btn-primary btn-icon" id="as-send" data-mode="send" aria-label="أرسل">${svg(IC.up)}</button></form>
+      </section>
+    </div>`;
+  }
+  window.DESIGN = {
+    key: 'silsila', shell, renderCard, renderList,
+    beforeAsk() { $('#app')?.classList.add('assist-open'); },
+    beforeCite() { if (matchMedia('(max-width: 820px)').matches) $('#app')?.classList.remove('assist-open'); },
+    onTheme(dark) { const b = $('#theme-btn'); if (b) b.innerHTML = svg(dark ? IC.sun : IC.moon); }
+  };
+  document.addEventListener('click', e => { const t = e.target.closest('[data-chain]'); if (!t) return; CH.p = t.dataset.chain; $('#chain').innerHTML = chainHTML(R[S.rid]); });
+  document.addEventListener('focusin', e => { if (e.target.id === 'as-input') $('#app')?.classList.add('assist-open'); });
+  Q.initTheme(false);
+  Q.mountAll();
+})();
+</script>
+</body>
+</html>
