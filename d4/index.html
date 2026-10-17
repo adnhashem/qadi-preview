@@ -14,9 +14,9 @@
   color-scheme: light;
   --bg: #f4f5f7; --bg-2: #ffffff; --bg-3: #e9ebef;
   --line: #dde0e6; --line-2: #c2c7d0;
-  --fg: #171a20; --fg-2: #474c57; --fg-3: #767c88;
+  --fg: #171a20; --fg-2: #474c57; --fg-3: #636975;
   --accent: #3d3a9c; --accent-2: #2d2a7a; --accent-soft: #ecebf8; --accent-line: #b9b6e3;
-  --ok: #1f7a46; --warn: #955f00; --unrev: #b4541a; --unrev-soft: #fff1e8;
+  --ok: #1f7a46; --warn: #955f00; --unrev: #ae5118; --unrev-soft: #fff1e8;
   --font-ui: 'IBM Plex Sans Arabic', system-ui, sans-serif;
   --font-reading: 'Noto Naskh Arabic', serif;
   --r: 8px; --ease: cubic-bezier(0.2, 0, 0, 1); --fast: 140ms; --mid: 240ms;
@@ -25,7 +25,7 @@
 :root[data-theme="dark"] {
   color-scheme: dark;
   --bg: #15171c; --bg-2: #1d2027; --bg-3: #262a33; --line: #2e323c; --line-2: #414651;
-  --fg: #eceef2; --fg-2: #b5b9c2; --fg-3: #858a95;
+  --fg: #eceef2; --fg-2: #b5b9c2; --fg-3: #8d929d;
   --accent: #a9a6ee; --accent-2: #c1bff4; --accent-soft: #262544; --accent-line: #4b4890;
   --ok: #6fc896; --warn: #e4b64c; --unrev: #e6905f; --unrev-soft: #2e241d;
 }
@@ -332,7 +332,7 @@ button, input, textarea { font: inherit; color: inherit; }
       </aside>
       <div>
         <div class="res-head"><h1>الأحكام</h1><span class="cnt"><span class="num">${ORDER.length}</span> نتائج</span><span class="sort">الترتيب: الأحدث</span></div>
-        <div class="overview"><div class="ov-head">${svg(IC.spark, 'ic-sm')}نظرة مولَّدة على النتائج — راجع الاستشهادات</div><p>أربعة أحكام من 2025، ثلاثة إدارية وواحد تجاري. يتكرر مبدآن: «لا حق مكتسب فيما صُرف بغير سند» في حكمين، و«العبرة بمطابقة المؤهل للنص» في حكمين — وانتهت الإدارية الثلاثة لصالح الإدارة. <span class="num">${pending}</span> منها لم تكتمل مراجعته بعد.</p></div>
+        <div class="overview"><div class="ov-head">${svg(IC.info, 'ic-sm')}نظرة مولَّدة على النتائج — راجع الاستشهادات</div><p>أربعة أحكام من 2025، ثلاثة إدارية وواحد تجاري. يتكرر مبدآن: «لا حق مكتسب فيما صُرف بغير سند» في حكمين، و«العبرة بمطابقة المؤهل للنص» في حكمين — وانتهت الإدارية الثلاثة لصالح الإدارة. <span class="num">${pending}</span> منها لم تكتمل مراجعته بعد.</p></div>
         ${cards}
       </div>
     </div>`;
